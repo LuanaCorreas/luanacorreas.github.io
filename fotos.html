@@ -19,7 +19,7 @@ h1 em{color:var(--terra)}
 a{color:inherit}
 :focus-visible{outline:3px solid var(--oliva);outline-offset:3px;border-radius:4px}
 .wrap{max-width:1100px;margin:0 auto}
-main{padding:8rem 1.25rem 5rem}
+main{padding:6.5rem 1.25rem 5rem}
 .btn{display:inline-block;padding:.85rem 1.7rem;border-radius:999px;border:2px solid var(--terra);background:var(--terra);color:#fff;text-decoration:none;font:500 1rem Outfit,sans-serif;transition:transform .2s,box-shadow .2s}
 .btn:hover{transform:translateY(-2px);box-shadow:var(--sombra)}
 /* NAV (igual à página principal) */
@@ -34,11 +34,22 @@ nav{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-conte
 .filtros{display:flex;gap:.6rem;flex-wrap:wrap;margin:1.4rem 0 2rem}
 .filtros button{font:400 .95rem Outfit,sans-serif;padding:.5rem 1.2rem;border-radius:999px;border:1.5px solid var(--oliva);background:transparent;color:var(--oliva);cursor:pointer}
 .filtros button[aria-pressed=true]{background:var(--oliva);color:#fff}
-.gal{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
-.foto{display:block;width:100%;border:0;font:inherit;color:inherit;text-align:left;cursor:zoom-in;background:var(--papel);padding:8px 8px 1rem;box-shadow:var(--sombra);transition:transform .25s}
+/* CARROSSEL */
+.carrossel{position:relative}
+.gal{display:flex;gap:1.4rem;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:.5rem 0 1.5rem;scrollbar-width:none}
+.gal::-webkit-scrollbar{display:none}
+.foto{flex:0 0 auto;scroll-snap-align:start;border:0;font:inherit;color:inherit;text-align:left;cursor:zoom-in;background:var(--papel);padding:10px 10px 1rem;box-shadow:var(--sombra);transition:transform .25s}
 .foto:hover{transform:translateY(-4px)}
+.seta{position:absolute;top:calc(50% - 2.5rem);transform:translateY(-50%);z-index:2;width:52px;height:52px;border-radius:50%;border:0;background:var(--terra);color:#fff;font-size:2rem;line-height:1;cursor:pointer;box-shadow:var(--sombra);display:grid;place-items:center;transition:opacity .2s,transform .2s}
+.seta:hover{transform:translateY(-50%) scale(1.08)}
+.seta:disabled{opacity:0;pointer-events:none}
+#ant{left:-26px}
+#prox{right:-26px}
+.conta{text-align:center;color:var(--oliva);font-weight:500;margin-top:.2rem}
 .foto[hidden]{display:none}
-.foto img{display:block;width:100%;aspect-ratio:9/16;object-fit:cover;background:#e7dccb}
+/* a altura acompanha a tela, para a foto inteira caber sem rolar */
+.foto img{display:block;height:min(max(340px,calc(100vh - 360px)),620px,138vw);width:auto;aspect-ratio:9/16;object-fit:cover;background:#e7dccb}
+.foto .tit,.foto small{max-width:min(max(190px,calc((100vh - 360px)*.5625)),350px,78vw)}
 .foto .tit{display:block;font:400 1.1rem/1.1 "DM Serif Display",serif;margin-top:.7rem}
 .foto small{display:block;color:var(--oliva);font-weight:500}
 .fim{text-align:center;margin-top:4rem}
@@ -59,7 +70,12 @@ footer{padding:2.5rem 1.25rem;text-align:center;border-top:1px solid rgba(58,42,
  #burger{display:block}
  #links{display:none;position:absolute;inset:100% 0 auto;flex-direction:column;background:var(--linho);padding:1rem 1.25rem;gap:1rem;border-bottom:1px solid rgba(58,42,34,.15)}
  #links.on{display:flex}
- .gal{grid-template-columns:repeat(2,1fr);gap:.8rem}
+ .gal{gap:1rem}
+ .foto{scroll-snap-align:center}
+ .foto img{height:min(max(300px,calc(100vh - 430px)),138vw)}
+ .seta{width:44px;height:44px;font-size:1.7rem}
+ #ant{left:-8px}
+ #prox{right:-8px}
  #zoom{padding:3.5rem .5rem 1rem}
  #zp,#zn{top:auto;bottom:1rem;transform:none}
  #zoom img{max-height:calc(100vh - 11rem)}
@@ -90,7 +106,12 @@ footer{padding:2.5rem 1.25rem;text-align:center;border-top:1px solid rgba(58,42,
   <p class="hand">fotos de produto e lifestyle</p>
   <h1>Meu <em>portfólio</em> de fotos</h1>
   <div class="filtros" id="filtros" role="group" aria-label="Filtrar por nicho"></div>
-  <div class="gal" id="gal"></div>
+  <div class="carrossel">
+   <button class="seta" id="ant" aria-label="Fotos anteriores">&#8249;</button>
+   <div class="gal" id="gal"></div>
+   <button class="seta" id="prox" aria-label="Próximas fotos">&#8250;</button>
+  </div>
+  <p class="conta" id="conta" aria-live="polite"></p>
   <div class="fim">
    <p>Gostou? Vamos criar fotos assim para a sua marca.</p>
    <a class="btn" href="index.html#contato">Falar comigo</a>
@@ -135,7 +156,21 @@ $("filtros").addEventListener("click",function(e){
  var b=e.target.closest("button");if(!b)return;
  document.querySelectorAll("#filtros button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});
  document.querySelectorAll(".foto").forEach(function(it){it.hidden=!(b.dataset.n==="Todos"||it.dataset.n===b.dataset.n)});
+ $("gal").scrollLeft=0;atualizaSetas();
 });
+
+/* carrossel: as setas andam uma foto por vez e somem nas pontas */
+function larguraPasso(){var f=document.querySelector(".foto:not([hidden])");return f?f.offsetWidth+parseFloat(getComputedStyle($("gal")).columnGap||0):300}
+function atualizaSetas(){
+ var g=$("gal"),fim=g.scrollWidth-g.clientWidth-2;
+ $("ant").disabled=g.scrollLeft<=2;$("prox").disabled=g.scrollLeft>=fim;
+ var total=visiveis().length,n=Math.min(total,Math.round(g.scrollLeft/larguraPasso())+1);
+ $("conta").textContent=total>1?n+" / "+total:"";
+}
+$("ant").onclick=function(){$("gal").scrollBy({left:-larguraPasso()})};
+$("prox").onclick=function(){$("gal").scrollBy({left:larguraPasso()})};
+$("gal").addEventListener("scroll",function(){clearTimeout(this.t);this.t=setTimeout(atualizaSetas,60)},{passive:true});
+addEventListener("resize",atualizaSetas);
 
 /* foto ampliada: navega só entre as fotos visíveis no filtro atual */
 var atual=0,antes=null;
@@ -158,6 +193,7 @@ $("zoom").addEventListener("touchend",function(e){if(x0===null)return;var dx=e.c
 
 $("burger").onclick=function(){var o=$("links").classList.toggle("on");this.setAttribute("aria-expanded",o)};
 $("ano").textContent=new Date().getFullYear();
+atualizaSetas();
 </script>
 </body>
 </html>
