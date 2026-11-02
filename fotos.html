@@ -134,6 +134,7 @@ footer{padding:2.5rem 1.25rem;text-align:center;border-top:1px solid rgba(58,42,
 /* ===== FOTOS (edite aqui)
    f: arquivo na pasta fotos/; t: título; n: nicho (vira o filtro); alt: descrição para leitores de tela ===== */
 var FOTOS=[
+ {f:"retrato.jpg",t:"Retrato",n:"Retratos",alt:"Retrato de Luana com metade do rosto atrás de uma parede de pedra"},
  {f:"elseve.jpg",t:"L'Oréal Elseve Collagen Lifter",n:"Beleza",alt:"Luana sorrindo com três produtos Elseve Collagen Lifter"},
  {f:"seda.jpg",t:"Seda Mega Crescimento",n:"Beleza",alt:"Luana sorrindo com produtos Seda Mega Crescimento"},
  {f:"img2464.jpg",t:"Garnier Hialurônico",n:"Beleza",alt:"Luana segurando o hidratante Garnier Hialurônico Toque Seco junto ao rosto"},
@@ -141,14 +142,15 @@ var FOTOS=[
  {f:"dove.jpg",t:"Dove Óleo Sérum Firmador",n:"Beleza",alt:"Luana sorrindo com o Óleo Sérum Corporal Firmador da Dove"},
  {f:"boticario.jpg",t:"O Boticário Cuide-se Bem",n:"Beleza",alt:"Luana mostrando o creme Cuide-se Bem Doçura na Pessegura"},
  {f:"skincare.jpg",t:"Textura de skincare",n:"Beleza",alt:"Close do rosto de Luana com um produto de skincare aplicado na bochecha"},
- {f:"look.jpg",t:"Look tricô off-white",n:"Moda",alt:"Luana de corpo inteiro com conjunto de tricô off-white"},
- {f:"retrato.jpg",t:"Retrato",n:"Retratos",alt:"Retrato de Luana com metade do rosto atrás de uma parede de pedra"}
+ {f:"look.jpg",t:"Look tricô off-white",n:"Moda",alt:"Luana de corpo inteiro com conjunto de tricô off-white"}
 ];
+/* ordem dos botões de filtro (nichos que não estiverem aqui entram no fim) */
+var ORDEM_FILTROS=["Beleza","Moda","Retratos"];
 
 var $=function(i){return document.getElementById(i)};
 function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
 
-var nichos=["Todos"];FOTOS.forEach(function(f){if(nichos.indexOf(f.n)<0)nichos.push(f.n)});
+var nichos=["Todos"].concat(ORDEM_FILTROS.filter(function(n){return FOTOS.some(function(f){return f.n===n})}));FOTOS.forEach(function(f){if(nichos.indexOf(f.n)<0)nichos.push(f.n)});
 $("filtros").innerHTML=nichos.map(function(n,i){return '<button type="button" aria-pressed="'+(i==0)+'" data-n="'+esc(n)+'">'+esc(n)+'</button>'}).join("");
 $("gal").innerHTML=FOTOS.map(function(f,i){return '<button type="button" class="foto" data-i="'+i+'" data-n="'+esc(f.n)+'" aria-label="Ampliar: '+esc(f.t)+'"><img src="fotos/'+esc(f.f)+'" alt="'+esc(f.alt)+'" loading="lazy" width="675" height="1200"><span class="tit">'+esc(f.t)+'</span><small>'+esc(f.n)+'</small></button>'}).join("");
 
