@@ -74,8 +74,11 @@ h1{font-size:clamp(3rem,9vw,6.4rem);letter-spacing:-.01em}
 .filtros button{font:400 .95rem Outfit,sans-serif;padding:.5rem 1.2rem;border-radius:999px;border:1.5px solid var(--oliva);background:transparent;color:var(--oliva);cursor:pointer}
 .filtros button[aria-pressed=true]{background:var(--oliva);color:#fff}
 .gal{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
-.item{background:var(--papel);padding:8px 8px 1rem;box-shadow:var(--sombra)}
-.item .ph{aspect-ratio:4/5;font-size:1rem}
+.item{display:block;text-decoration:none;background:var(--papel);padding:8px 8px 1rem;box-shadow:var(--sombra);transition:transform .25s}
+.item:hover{transform:translateY(-4px)}
+.thumb{position:relative;aspect-ratio:9/16;overflow:hidden;background:var(--tinta)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .play{width:52px;height:52px}
 .item h3{font-size:1.1rem;margin-top:.7rem}
 .item small{color:var(--oliva);font-weight:500}
 .item[hidden]{display:none}
@@ -283,7 +286,7 @@ footer a{margin:0 .6rem}
 var PERFIL={whats:"5521967176117",email:"luanadcorreas@yahoo.com.br",insta:"luanascorrea"};
 
 /* ===== MARCAS (nomes na faixa) ===== */
-var MARCAS=["Pantene","Eudora","Dove","Marca 04","Marca 05","Marca 06","Marca 07","Marca 08","Marca 09","Marca 10","Marca 11","Marca 12"];
+var MARCAS=["Pantene","Eudora","Dove","Boticário","Lux","Kunda Care","Oceane"];
 
 /* ===== NÚMEROS DA CAPA (troque o valor "to" pelo seu número real) ===== */
 var CAPA=[{to:0,pre:"+",l:"vídeos entregues"},{to:0,pre:"+",l:"marcas atendidas"},{to:0,pre:"+",l:"views somadas"}];
@@ -297,12 +300,19 @@ var DESTAQUES=[
  {link:"#",capa:"",num:"+0,0M",rot:"views no reels",t:"Título do conteúdo 03",c:"Uma linha de contexto sobre a campanha."}
 ];
 
-/* ===== TRABALHOS (nicho define o filtro; img: arquivo da foto 4:5, ou "" para degradê) ===== */
+/* ===== TRABALHOS (n: nicho, vira o filtro; v: código do vídeo no YouTube, o trecho depois de /shorts/) ===== */
 var TRABALHOS=[
- {t:"Trabalho 01",n:"Cabelo",img:""},{t:"Trabalho 02",n:"Cabelo",img:""},
- {t:"Trabalho 03",n:"Maquiagem",img:""},{t:"Trabalho 04",n:"Maquiagem",img:""},
- {t:"Trabalho 05",n:"Cuidados com a pele",img:""},{t:"Trabalho 06",n:"Cuidados com a pele",img:""},
- {t:"Trabalho 07",n:"Casa",img:""},{t:"Trabalho 08",n:"Casa",img:""}
+ {t:"Boticário",n:"Beleza",v:"AwO9YcbSA-k"},
+ {t:"Lux (sabores líquidos)",n:"Beleza",v:"NfQbWCoFxrk"},
+ {t:"Dove Repair e Glow",n:"Beleza",v:"dgLE2Go5Srw"},
+ {t:"Dove (Skin banho)",n:"Beleza",v:"3QAihRJsjq0"},
+ {t:"Kunda Care",n:"Beleza",v:"Rt-rCEiIZ1Q"},
+ {t:"Eudora Siàge",n:"Beleza",v:"N13bgZQx2Q8"},
+ {t:"Pantene",n:"Beleza",v:"n3vMTaLloKc"},
+ {t:"Dove (Óleo Hidratante Firmador)",n:"Beleza",v:"4OQhZs-saWU"},
+ {t:"Balm Oceane",n:"Beleza",v:"vGN-S8cmTDc"},
+ {t:"Vista-me",n:"Moda",v:"V3wXZVkAzVo"},
+ {t:"Arrume-se comigo",n:"Moda",v:"RS7zmOq04pM"}
 ];
 
 /* ===== SERVIÇOS ===== */
@@ -357,7 +367,7 @@ $("tres").innerHTML=DESTAQUES.map(function(d){
 
 var nichos=["Todos"];TRABALHOS.forEach(function(t){if(nichos.indexOf(t.n)<0)nichos.push(t.n)});
 $("filtros").innerHTML=nichos.map(function(n,i){return '<button type="button" aria-pressed="'+(i==0)+'" data-n="'+n+'">'+n+'</button>'}).join("");
-$("gal").innerHTML=TRABALHOS.map(function(t){return '<article class="item" data-n="'+t.n+'">'+(t.img?ph(t.img,"","Trabalho "+t.t):'<div class="ph" role="img" aria-label="Espaço para trabalho '+t.t+'">foto 4:5</div>')+'<h3>'+t.t+'</h3><small>'+t.n+'</small></article>'}).join("");
+$("gal").innerHTML=TRABALHOS.map(function(t){return '<a class="item" data-n="'+esc(t.n)+'" href="https://youtube.com/shorts/'+esc(t.v)+'" target="_blank" rel="noopener" aria-label="Assistir: '+esc(t.t)+'"><div class="thumb"><img src="https://i.ytimg.com/vi/'+esc(t.v)+'/hqdefault.jpg" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div><h3>'+esc(t.t)+'</h3><small>'+esc(t.n)+'</small></a>'}).join("");
 $("filtros").addEventListener("click",function(e){
  var b=e.target.closest("button");if(!b)return;
  document.querySelectorAll("#filtros button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});
