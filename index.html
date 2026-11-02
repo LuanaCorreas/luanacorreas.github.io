@@ -367,7 +367,10 @@ $("tres").innerHTML=DESTAQUES.map(function(d){
 
 var nichos=["Todos"];TRABALHOS.forEach(function(t){if(nichos.indexOf(t.n)<0)nichos.push(t.n)});
 $("filtros").innerHTML=nichos.map(function(n,i){return '<button type="button" aria-pressed="'+(i==0)+'" data-n="'+n+'">'+n+'</button>'}).join("");
-$("gal").innerHTML=TRABALHOS.map(function(t){return '<a class="item" data-n="'+esc(t.n)+'" href="https://youtube.com/shorts/'+esc(t.v)+'" target="_blank" rel="noopener" aria-label="Assistir: '+esc(t.t)+'"><div class="thumb"><img src="https://i.ytimg.com/vi/'+esc(t.v)+'/hqdefault.jpg" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></div><h3>'+esc(t.t)+'</h3><small>'+esc(t.n)+'</small></a>'}).join("");
+/* capas vêm direto do YouTube; troque CAPAS_VERSAO quando mudar as capas lá, para os navegadores buscarem as novas */
+var CAPAS_VERSAO="2026-11-02";
+function capaReserva(img){if(img.src.indexOf("/oar2.jpg")>0)img.src=img.src.replace("/oar2.jpg","/hqdefault.jpg");else img.style.visibility="hidden"}
+$("gal").innerHTML=TRABALHOS.map(function(t){return '<a class="item" data-n="'+esc(t.n)+'" href="https://youtube.com/shorts/'+esc(t.v)+'" target="_blank" rel="noopener" aria-label="Assistir: '+esc(t.t)+'"><div class="thumb"><img src="https://i.ytimg.com/vi/'+esc(t.v)+'/oar2.jpg?v='+CAPAS_VERSAO+'" alt="" loading="lazy" onerror="capaReserva(this)" onload="if(this.naturalWidth<=120)capaReserva(this)"><span class="play" aria-hidden="true"></span></div><h3>'+esc(t.t)+'</h3><small>'+esc(t.n)+'</small></a>'}).join("");
 $("filtros").addEventListener("click",function(e){
  var b=e.target.closest("button");if(!b)return;
  document.querySelectorAll("#filtros button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});
