@@ -303,13 +303,16 @@ var MARCAS=[
 /* ===== NÚMEROS DA CAPA (troque o valor "to" pelo seu número real) ===== */
 var CAPA=[{to:0,pre:"+",l:"vídeos entregues"},{to:0,pre:"+",l:"marcas atendidas"},{to:0,pre:"+",l:"views somadas"}];
 
+/* capas vêm direto do YouTube; troque CAPAS_VERSAO quando mudar as capas lá, para os navegadores buscarem as novas */
+var CAPAS_VERSAO="2026-11-02b";
+
 /* ===== DESTAQUES =====
-   link: coloque aqui o endereço do vídeo (Instagram, TikTok, YouTube).
-   capa: coloque aqui o arquivo da capa vertical 9:16, ex: "capa1.jpg". Deixe "" para mostrar o bloco de degradê. */
+   link: endereço do vídeo; v: código do vídeo no YouTube (a capa vem de lá).
+   num, rot, t, c: número em destaque, legenda do número, título e uma linha de contexto. Campos vazios ("") não aparecem. */
 var DESTAQUES=[
- {link:"#",capa:"",num:"+0,0M",rot:"views no reels",t:"Título do conteúdo 01",c:"Uma linha de contexto sobre a campanha."},
- {link:"#",capa:"",num:"+0,0M",rot:"views no reels",t:"Título do conteúdo 02",c:"Uma linha de contexto sobre a campanha."},
- {link:"#",capa:"",num:"+0,0M",rot:"views no reels",t:"Título do conteúdo 03",c:"Uma linha de contexto sobre a campanha."}
+ {link:"https://youtu.be/rUF_CPzr8QQ",v:"rUF_CPzr8QQ",num:"",rot:"",t:"",c:""},
+ {link:"https://youtube.com/shorts/Rt-rCEiIZ1Q",v:"Rt-rCEiIZ1Q",num:"",rot:"",t:"Kunda Care",c:""},
+ {link:"https://youtube.com/shorts/V3wXZVkAzVo",v:"V3wXZVkAzVo",num:"",rot:"",t:"Vista-me",c:""}
 ];
 
 /* ===== TRABALHOS (n: nicho, vira o filtro; v: código do vídeo no YouTube, o trecho depois de /shorts/) ===== */
@@ -374,15 +377,14 @@ var bq=SERVICOS.map(function(s){return "<span>"+s.t+" &bull;</span>"}).join("");
 $("band").innerHTML=bq+bq+bq+bq;
 
 $("tres").innerHTML=DESTAQUES.map(function(d){
- var corpo='<div class="capa9">'+ph(d.capa,"capa do vídeo 9:16","Capa do vídeo "+d.t)+'<span class="play" aria-hidden="true"></span></div><div class="big">'+d.num+'</div><div class="rot">'+d.rot+'</div><h3>'+d.t+'</h3><p>'+d.c+'</p>';
+ var corpo='<div class="capa9 thumb"><img src="https://i.ytimg.com/vi/'+esc(d.v)+'/maxresdefault.jpg?v='+CAPAS_VERSAO+'" alt="" loading="lazy" onerror="capaReserva(this)" onload="if(this.naturalWidth<=120)capaReserva(this)"><span class="play" aria-hidden="true"></span></div>'
+  +(d.num?'<div class="big">'+esc(d.num)+'</div>':'')+(d.rot?'<div class="rot">'+esc(d.rot)+'</div>':'')+(d.t?'<h3>'+esc(d.t)+'</h3>':'')+(d.c?'<p>'+esc(d.c)+'</p>':'');
  /* sem link ainda: mostra o card sem abrir uma aba vazia */
  if(!d.link||d.link==="#")return '<div class="card rv">'+corpo+'</div>';
- return '<a class="card rv" href="'+esc(d.link)+'" target="_blank" rel="noopener" aria-label="Assistir: '+esc(d.t)+'">'+corpo+'</a>'}).join("");
+ return '<a class="card rv" href="'+esc(d.link)+'" target="_blank" rel="noopener" aria-label="Assistir: '+esc(d.t||"vídeo em destaque")+'">'+corpo+'</a>'}).join("");
 
 var nichos=["Todos"];TRABALHOS.forEach(function(t){if(nichos.indexOf(t.n)<0)nichos.push(t.n)});
 $("filtros").innerHTML=nichos.map(function(n,i){return '<button type="button" aria-pressed="'+(i==0)+'" data-n="'+n+'">'+n+'</button>'}).join("");
-/* capas vêm direto do YouTube; troque CAPAS_VERSAO quando mudar as capas lá, para os navegadores buscarem as novas */
-var CAPAS_VERSAO="2026-11-02b";
 /* maxresdefault é a capa escolhida no YouTube Studio; se faltar, usa a menor */
 function capaReserva(img){if(img.src.indexOf("/maxresdefault.jpg")>0)img.src=img.src.replace("/maxresdefault.jpg","/hqdefault.jpg");else img.style.visibility="hidden"}
 $("gal").innerHTML=TRABALHOS.map(function(t){return '<a class="item" data-n="'+esc(t.n)+'" href="https://youtube.com/shorts/'+esc(t.v)+'" target="_blank" rel="noopener" aria-label="Assistir: '+esc(t.t)+'"><div class="thumb"><img src="https://i.ytimg.com/vi/'+esc(t.v)+'/maxresdefault.jpg?v='+CAPAS_VERSAO+'" alt="" loading="lazy" onerror="capaReserva(this)" onload="if(this.naturalWidth<=120)capaReserva(this)"><span class="play" aria-hidden="true"></span></div><h3>'+esc(t.t)+'</h3><small>'+esc(t.n)+'</small></a>'}).join("");
