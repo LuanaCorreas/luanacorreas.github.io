@@ -49,7 +49,8 @@ h1{font-size:clamp(3rem,9vw,6.4rem);letter-spacing:-.01em}
 .faixa{margin:4rem -1.25rem 0;background:var(--papel);border-block:1px solid rgba(58,42,34,.12);overflow:hidden;padding:.9rem 0;white-space:nowrap}
 .faixa div,.band div{display:inline-block;animation:roll 30s linear infinite}
 .faixa span{display:inline-flex;align-items:center;height:48px;margin:0 2.4rem;vertical-align:middle}
-.faixa img{display:block;width:auto;filter:brightness(0);opacity:.7}
+.faixa img{display:block;width:auto}
+.faixa i{display:block;background:var(--c);-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
 @keyframes roll{to{transform:translateX(-50%)}}
 /* SOBRE */
 .sobre{display:grid;grid-template-columns:1fr 1.2fr;gap:3rem;align-items:center}
@@ -286,13 +287,14 @@ footer a{margin:0 .6rem}
 /* ===== DADOS PESSOAIS (edite aqui) ===== */
 var PERFIL={whats:"5521967176117",email:"luanadcorreas@yahoo.com.br",insta:"luanascorrea"};
 
-/* ===== MARCAS (logos na faixa; arquivos na pasta logos/, h = altura em px) ===== */
+/* ===== MARCAS (logos na faixa; arquivos na pasta logos/, h = altura em px)
+   cor + w: pinta o logo inteiro nessa cor (w = largura em px); sem cor, usa as cores do próprio arquivo ===== */
 var MARCAS=[
  {n:"Pantene",logo:"logos/pantene.svg",h:22},
  {n:"Eudora",logo:"logos/eudora.svg",h:26},
  {n:"Dove",logo:"logos/dove.svg",h:44},
- {n:"O Boticário",logo:"logos/boticario.svg",h:20},
- {n:"Lux",logo:"logos/lux.png",h:34},
+ {n:"O Boticário",logo:"logos/boticario.svg",h:20,w:153,cor:"#007A54"},
+ {n:"Lux",logo:"logos/lux.png",h:34,w:83,cor:"#8B5CC4"},
  {n:"Kunda Care",logo:"logos/kunda.png",h:46},
  {n:"Océane",logo:"logos/oceane.png",h:38}
 ];
@@ -363,7 +365,9 @@ function ph(src,leg,alt){return src?'<img src="'+esc(src)+'" alt="'+esc(alt)+'" 
 /* números ainda em 0 ficam escondidos até você preencher */
 function comValor(m){return m.to>0}
 $("stats").innerHTML=CAPA.filter(comValor).map(function(c){return '<div><b data-to="'+c.to+'" data-pre="'+c.pre+'">'+c.pre+fmt(c.to)+'</b><span>'+c.l+'</span></div>'}).join("");
-function marcas(oculto){return MARCAS.map(function(m){return '<span><img src="'+esc(m.logo)+'" alt="'+(oculto?'':esc(m.n))+'" style="height:'+m.h+'px"></span>'}).join("")}
+function marcas(oculto){return MARCAS.map(function(m){
+ if(m.cor)return '<span><i '+(oculto?'aria-hidden="true"':'role="img" aria-label="'+esc(m.n)+'"')+' style="--c:'+m.cor+';--m:url('+esc(m.logo)+');width:'+m.w+'px;height:'+m.h+'px"></i></span>';
+ return '<span><img src="'+esc(m.logo)+'" alt="'+(oculto?'':esc(m.n))+'" style="height:'+m.h+'px"></span>'}).join("")}
 $("marcas").innerHTML=marcas(false)+marcas(true);
 var bq=SERVICOS.map(function(s){return "<span>"+s.t+" &bull;</span>"}).join("");
 $("band").innerHTML=bq+bq+bq+bq;
