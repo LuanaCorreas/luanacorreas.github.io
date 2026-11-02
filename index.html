@@ -48,7 +48,8 @@ h1{font-size:clamp(3rem,9vw,6.4rem);letter-spacing:-.01em}
 .carimbo{position:absolute;right:-22px;bottom:-26px;width:104px;height:104px;border-radius:50%;border:2px dashed var(--terra);background:var(--papel);color:var(--terra);display:grid;place-items:center;text-align:center;font:500 1.15rem/1.1 Caveat,cursive;transform:rotate(-12deg)}
 .faixa{margin:4rem -1.25rem 0;background:var(--papel);border-block:1px solid rgba(58,42,34,.12);overflow:hidden;padding:.9rem 0;white-space:nowrap}
 .faixa div,.band div{display:inline-block;animation:roll 30s linear infinite}
-.faixa span{margin:0 2rem;font:italic 1.2rem "DM Serif Display",serif;color:var(--oliva)}
+.faixa span{display:inline-flex;align-items:center;height:48px;margin:0 2.4rem;vertical-align:middle}
+.faixa img{display:block;width:auto;filter:brightness(0);opacity:.7}
 @keyframes roll{to{transform:translateX(-50%)}}
 /* SOBRE */
 .sobre{display:grid;grid-template-columns:1fr 1.2fr;gap:3rem;align-items:center}
@@ -285,8 +286,16 @@ footer a{margin:0 .6rem}
 /* ===== DADOS PESSOAIS (edite aqui) ===== */
 var PERFIL={whats:"5521967176117",email:"luanadcorreas@yahoo.com.br",insta:"luanascorrea"};
 
-/* ===== MARCAS (nomes na faixa) ===== */
-var MARCAS=["Pantene","Eudora","Dove","Boticário","Lux","Kunda Care","Oceane"];
+/* ===== MARCAS (logos na faixa; arquivos na pasta logos/, h = altura em px) ===== */
+var MARCAS=[
+ {n:"Pantene",logo:"logos/pantene.svg",h:22},
+ {n:"Eudora",logo:"logos/eudora.svg",h:26},
+ {n:"Dove",logo:"logos/dove.svg",h:44},
+ {n:"O Boticário",logo:"logos/boticario.svg",h:20},
+ {n:"Lux",logo:"logos/lux.png",h:34},
+ {n:"Kunda Care",logo:"logos/kunda.png",h:46},
+ {n:"Océane",logo:"logos/oceane.png",h:38}
+];
 
 /* ===== NÚMEROS DA CAPA (troque o valor "to" pelo seu número real) ===== */
 var CAPA=[{to:0,pre:"+",l:"vídeos entregues"},{to:0,pre:"+",l:"marcas atendidas"},{to:0,pre:"+",l:"views somadas"}];
@@ -354,8 +363,8 @@ function ph(src,leg,alt){return src?'<img src="'+esc(src)+'" alt="'+esc(alt)+'" 
 /* números ainda em 0 ficam escondidos até você preencher */
 function comValor(m){return m.to>0}
 $("stats").innerHTML=CAPA.filter(comValor).map(function(c){return '<div><b data-to="'+c.to+'" data-pre="'+c.pre+'">'+c.pre+fmt(c.to)+'</b><span>'+c.l+'</span></div>'}).join("");
-var mq=MARCAS.map(function(m){return "<span>"+m+"</span>"}).join("");
-$("marcas").innerHTML=mq+mq;
+function marcas(oculto){return MARCAS.map(function(m){return '<span><img src="'+esc(m.logo)+'" alt="'+(oculto?'':esc(m.n))+'" style="height:'+m.h+'px"></span>'}).join("")}
+$("marcas").innerHTML=marcas(false)+marcas(true);
 var bq=SERVICOS.map(function(s){return "<span>"+s.t+" &bull;</span>"}).join("");
 $("band").innerHTML=bq+bq+bq+bq;
 
