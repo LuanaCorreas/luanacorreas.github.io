@@ -252,6 +252,7 @@ footer a{margin:0 .6rem}
     <a class="btn" id="bz" href="#">WhatsApp</a>
     <a class="btn o" id="be" href="#">E-mail</a>
     <a class="btn o" id="bi" href="#" target="_blank" rel="noopener">Instagram</a>
+    <a class="btn o" id="bt" href="#" target="_blank" rel="noopener">TikTok</a>
    </div>
   </div>
   <form id="form" class="rv">
@@ -268,7 +269,7 @@ footer a{margin:0 .6rem}
 <!-- 8. RODAPÉ -->
 <footer>
  <p class="serif" style="font-size:1.3rem">Luana Corrêa Andrade da Silva</p>
- <p><a id="fi" href="#" target="_blank" rel="noopener">Instagram</a><a id="fe2" href="#">E-mail</a><a id="fw" href="#">WhatsApp</a></p>
+ <p><a id="fi" href="#" target="_blank" rel="noopener">Instagram</a><a id="ft" href="#" target="_blank" rel="noopener">TikTok</a><a id="fe2" href="#">E-mail</a><a id="fw" href="#">WhatsApp</a></p>
  <p>&copy; <span id="ano"></span> Luana Corrêa. Todos os direitos reservados.</p>
 </footer>
 
@@ -289,7 +290,7 @@ footer a{margin:0 .6rem}
 
 <script>
 /* ===== DADOS PESSOAIS (edite aqui) ===== */
-var PERFIL={whats:"5521967176117",email:"luanadcorreas@yahoo.com.br",insta:"luanascorrea"};
+var PERFIL={whats:"5521967176117",whatsTexto:"+55 21 96717-6117",email:"luanasil.ugc@gmail.com",insta:"luanascorrea",tiktok:"luanascorreaa"};
 
 /* ===== MARCAS (logos na faixa; arquivos na pasta logos/, h = altura em px)
    cor + w: pinta o logo inteiro nessa cor (w = largura em px); sem cor, usa as cores do próprio arquivo ===== */
@@ -404,9 +405,12 @@ $("deps").innerHTML=DEPOIMENTOS.map(function(d){return '<blockquote class="rv"><
 
 /* contatos */
 var wa="https://wa.me/"+PERFIL.whats+"?text="+encodeURIComponent("Oi Luana! Vi seu portfólio e quero conversar.");
-var mail="mailto:"+PERFIL.email, ig="https://instagram.com/"+PERFIL.insta;
-$("bz").href=wa;$("be").href=mail;$("bi").href=ig;$("fw").href=wa;$("fe2").href=mail;$("fi").href=ig;
-$("fi").textContent="Instagram @"+PERFIL.insta;
+var mail="mailto:"+PERFIL.email, ig="https://instagram.com/"+PERFIL.insta, tt="https://www.tiktok.com/@"+PERFIL.tiktok;
+$("bz").href=wa;$("be").href=mail;$("bi").href=ig;$("bt").href=tt;$("fw").href=wa;$("fe2").href=mail;$("fi").href=ig;$("ft").href=tt;
+/* os botões mostram o contato escrito, para a marca poder copiar */
+$("bz").textContent="WhatsApp "+PERFIL.whatsTexto;$("be").textContent=PERFIL.email;
+$("bi").textContent="Instagram @"+PERFIL.insta;$("bt").textContent="TikTok @"+PERFIL.tiktok;
+$("fi").textContent="Instagram @"+PERFIL.insta;$("ft").textContent="TikTok @"+PERFIL.tiktok;
 $("ano").textContent=new Date().getFullYear();
 
 /* menu */
