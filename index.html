@@ -78,11 +78,12 @@ h1{font-size:clamp(3rem,9vw,6.4rem);letter-spacing:-.01em}
 .item{display:block;text-decoration:none;background:var(--papel);padding:8px 8px 1rem;box-shadow:var(--sombra);transition:transform .25s}
 .item:hover{transform:translateY(-4px)}
 .thumb{position:relative;aspect-ratio:9/16;overflow:hidden;background:var(--tinta)}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:cover;display:block}
+.thumb video{object-fit:contain;background:#000}
+button.thumb{display:block;width:100%;padding:0;border:0;cursor:pointer;font:inherit}
+button.thumb:hover .play{transform:scale(1.08)}
+.play{transition:transform .2s}
 .thumb .play{width:52px;height:52px}
-.thumb>button{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer;display:block}
-.thumb iframe,.thumb video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
-.verig{display:inline-block;margin-top:.4rem;font-size:.9rem;color:var(--terra)}
 .item h3{font-size:1.1rem;margin-top:.7rem}
 .item small{color:var(--oliva);font-weight:500}
 .item[hidden]{display:none}
@@ -115,8 +116,6 @@ textarea{min-height:120px;resize:vertical}
 .canais{display:flex;flex-direction:column;gap:.8rem;margin-top:1.4rem;align-items:flex-start}
 footer{padding:2.5rem 1.25rem;text-align:center;border-top:1px solid rgba(58,42,34,.15);background:var(--papel)}
 footer a{margin:0 .6rem}
-#aviso{position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%);z-index:120;background:var(--tinta);color:#fff;padding:.7rem 1.2rem;border-radius:999px;font-size:.95rem;box-shadow:var(--sombra);display:none}
-#aviso.on{display:block}
 /* OBJETOS EM CSS */
 .obj{position:absolute;z-index:0;pointer-events:none;animation:flut 7s ease-in-out infinite;opacity:.9}
 @keyframes flut{50%{transform:translateY(-14px) rotate(3deg)}}
@@ -254,7 +253,7 @@ footer a{margin:0 .6rem}
    <h2>Bora criar <em>juntos</em></h2>
    <p>Conte o que a sua marca precisa e eu respondo com carinho e rapidez.</p>
    <div class="canais">
-    <a class="btn" id="bz" href="#" target="_blank" rel="noopener">WhatsApp</a>
+    <a class="btn" id="bz" href="#">WhatsApp</a>
     <a class="btn o" id="be" href="#">E-mail</a>
     <a class="btn o" id="bi" href="#" target="_blank" rel="noopener">Instagram</a>
     <a class="btn o" id="bt" href="#" target="_blank" rel="noopener">TikTok</a>
@@ -274,7 +273,7 @@ footer a{margin:0 .6rem}
 <!-- 8. RODAPÉ -->
 <footer>
  <p class="serif" style="font-size:1.3rem">Luana Corrêa Andrade da Silva</p>
- <p><a id="fi" href="#" target="_blank" rel="noopener">Instagram</a><a id="ft" href="#" target="_blank" rel="noopener">TikTok</a><a id="fe2" href="#">E-mail</a><a id="fw" href="#" target="_blank" rel="noopener">WhatsApp</a></p>
+ <p><a id="fi" href="#" target="_blank" rel="noopener">Instagram</a><a id="ft" href="#" target="_blank" rel="noopener">TikTok</a><a id="fe2" href="#">E-mail</a><a id="fw" href="#">WhatsApp</a></p>
  <p>&copy; <span id="ano"></span> Luana Corrêa. Todos os direitos reservados.</p>
 </footer>
 
@@ -292,8 +291,6 @@ footer a{margin:0 .6rem}
   </form>
  </div>
 </div>
-
-<p id="aviso" role="status" aria-live="polite"></p>
 
 <script>
 /* ===== DADOS PESSOAIS (edite aqui) ===== */
@@ -314,34 +311,32 @@ var MARCAS=[
 /* ===== NÚMEROS DA CAPA (troque o valor "to" pelo seu número real) ===== */
 var CAPA=[{to:0,pre:"+",l:"vídeos entregues"},{to:0,pre:"+",l:"marcas atendidas"},{to:0,pre:"+",l:"views somadas"}];
 
-/* capas vêm direto do YouTube; troque CAPAS_VERSAO quando mudar as capas lá, para os navegadores buscarem as novas */
-var CAPAS_VERSAO="2026-11-02b";
+/* ===== VÍDEOS =====
+   Os vídeos ficam no próprio site (pasta videos/) e tocam dentro do card, sem YouTube.
+   video: arquivo .mp4; capa: imagem da capa (pasta videos/capas/).
+   link: só para vídeos que ainda não têm arquivo; o card abre esse endereço em outra aba. */
 
-/* ===== DESTAQUES =====
-   v: código do vídeo no YouTube (o vídeo toca aqui mesmo na página e a capa vem de lá).
-   arq (opcional): arquivo do vídeo na pasta videos/, ex: "videos/valho-muito.mp4". Com ele o vídeo toca sem a marca do YouTube.
-   link: endereço do mesmo vídeo no Instagram (aparece como "ver no Instagram"; deixe "" para esconder).
+/* ===== DESTAQUES
    num, rot, t, c: número em destaque, legenda do número, título e uma linha de contexto. Campos vazios ("") não aparecem. */
 var DESTAQUES=[
- {link:"https://www.instagram.com/reel/DVmw02JDGxP/",v:"rUF_CPzr8QQ",num:"1.628",rot:"visualizações no Instagram",t:"Valho muito",c:""},
- {link:"https://www.instagram.com/reel/De4qGZtB_o8/",v:"Rt-rCEiIZ1Q",num:"738",rot:"visualizações no Instagram",t:"Kunda Care",c:""},
- {link:"https://www.instagram.com/reel/De6-hAUsznH/",v:"V3wXZVkAzVo",num:"609",rot:"visualizações no Instagram",t:"Vista-me",c:""}
+ {video:"",capa:"videos/capas/valho-muito.jpg",link:"https://www.instagram.com/reel/DVmw02JDGxP/",num:"1.628",rot:"visualizações no Instagram",t:"Valho muito",c:""},
+ {video:"videos/kunda-care.mp4",capa:"videos/capas/kunda-care.jpg",num:"738",rot:"visualizações no Instagram",t:"Kunda Care",c:""},
+ {video:"videos/vista-me.mp4",capa:"videos/capas/vista-me.jpg",num:"609",rot:"visualizações no Instagram",t:"Vista-me",c:""}
 ];
 
-/* ===== TRABALHOS (n: nicho, vira o filtro; v: código do vídeo no YouTube, o trecho depois de /shorts/; o vídeo toca na própria página;
-   arq (opcional): arquivo na pasta videos/, ex: arq:"videos/boticario.mp4", para tocar sem a marca do YouTube) ===== */
+/* ===== TRABALHOS (n: nicho, vira o filtro) ===== */
 var TRABALHOS=[
- {t:"Boticário",n:"Beleza",v:"AwO9YcbSA-k"},
- {t:"Lux (sabores líquidos)",n:"Beleza",v:"NfQbWCoFxrk"},
- {t:"Dove Repair e Glow",n:"Beleza",v:"dgLE2Go5Srw"},
- {t:"Dove (Skin banho)",n:"Beleza",v:"2lB9kVLCsfQ"},
- {t:"Kunda Care",n:"Beleza",v:"Rt-rCEiIZ1Q"},
- {t:"Eudora Siàge",n:"Beleza",v:"N13bgZQx2Q8"},
- {t:"Pantene",n:"Beleza",v:"n3vMTaLloKc"},
- {t:"Dove (Óleo Hidratante Firmador)",n:"Beleza",v:"4OQhZs-saWU"},
- {t:"Balm Oceane",n:"Beleza",v:"vGN-S8cmTDc"},
- {t:"Vista-me",n:"Moda",v:"V3wXZVkAzVo"},
- {t:"Arrume-se comigo",n:"Moda",v:"7izRhrXToTI"}
+ {t:"Boticário",n:"Beleza",video:"videos/boticario.mp4",capa:"videos/capas/boticario.jpg"},
+ {t:"Lux (sabores líquidos)",n:"Beleza",video:"videos/lux.mp4",capa:"videos/capas/lux.jpg"},
+ {t:"Dove Repair e Glow",n:"Beleza",video:"",capa:"videos/capas/dove-repair.jpg",link:"https://youtube.com/shorts/dgLE2Go5Srw"},
+ {t:"Dove (Skin banho)",n:"Beleza",video:"videos/dove-skin-banho.mp4",capa:"videos/capas/dove-skin-banho.jpg"},
+ {t:"Kunda Care",n:"Beleza",video:"videos/kunda-care.mp4",capa:"videos/capas/kunda-care.jpg"},
+ {t:"Eudora Siàge",n:"Beleza",video:"videos/eudora-siage.mp4",capa:"videos/capas/eudora-siage.jpg"},
+ {t:"Pantene",n:"Beleza",video:"videos/pantene.mp4",capa:"videos/capas/pantene.jpg"},
+ {t:"Dove (Óleo Hidratante Firmador)",n:"Beleza",video:"videos/dove-oleo-firmador.mp4",capa:"videos/capas/dove-oleo-firmador.jpg"},
+ {t:"Balm Oceane",n:"Beleza",video:"videos/balm-oceane.mp4",capa:"videos/capas/balm-oceane.jpg"},
+ {t:"Vista-me",n:"Moda",video:"videos/vista-me.mp4",capa:"videos/capas/vista-me.jpg"},
+ {t:"Arrume-se comigo",n:"Moda",video:"videos/arrume-se-comigo.mp4",capa:"videos/capas/arrume-se-comigo.jpg"}
 ];
 
 /* ===== SERVIÇOS ===== */
@@ -390,52 +385,40 @@ $("marcas").innerHTML=marcas(false)+marcas(true);
 var bq=SERVICOS.map(function(s){return "<span>"+s.t+" &bull;</span>"}).join("");
 $("band").innerHTML=bq+bq+bq+bq;
 
-/* ===== VÍDEOS TOCANDO NA PÁGINA ===== */
-function capaVideo(v,titulo,arq){
- return '<button type="button" data-v="'+esc(v)+'" data-a="'+esc(arq||"")+'" data-t="'+esc(titulo)+'" aria-label="Assistir: '+esc(titulo)+'"><img src="https://i.ytimg.com/vi/'+esc(v)+'/maxresdefault.jpg?v='+CAPAS_VERSAO+'" alt="" loading="lazy" onerror="capaReserva(this)" onload="if(this.naturalWidth<=120)capaReserva(this)"><span class="play" aria-hidden="true"></span></button>'}
-var tocando=null;
-function parar(){if(tocando){tocando.box.innerHTML=tocando.html;tocando=null}}
-document.addEventListener("click",function(e){
- var b=e.target.closest(".thumb>button");if(!b)return;
- var box=b.parentNode;parar();tocando={box:box,html:box.innerHTML};
- /* arquivo próprio (pasta videos/): toca sem nada do YouTube, com as legendas exatamente como no vídeo */
- if(b.dataset.a){
-  box.innerHTML='<video src="'+esc(b.dataset.a)+'" controls autoplay playsinline aria-label="'+esc(b.dataset.t)+'"></video>';
-  box.querySelector("video").focus();return}
- box.innerHTML='<iframe src="https://www.youtube.com/embed/'+esc(b.dataset.v)+'?autoplay=1&playsinline=1&rel=0&cc_load_policy=0&iv_load_policy=3&enablejsapi=1&origin='+encodeURIComponent(location.origin)+'" title="'+esc(b.dataset.t)+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>';
- var f=box.querySelector("iframe");f.focus();semLegendaAuto(f);
-});
-/* desliga as legendas automáticas do YouTube (as de fundo preto) */
-function semLegendaAuto(f){
- apiYT(function(){new YT.Player(f,{events:{
-  onReady:function(e){tira(e.target)},
-  onApiChange:function(e){tira(e.target)},
-  onStateChange:function(e){if(e.data===1)tira(e.target)}}})});
- function tira(p){try{p.unloadModule("captions");p.unloadModule("cc");p.setOption("captions","track",{})}catch(x){}}
+/* capa com botão de play: com arquivo, o vídeo toca ali mesmo; sem arquivo, o card inteiro vira link */
+function tela(v,extra){
+ var img='<img src="'+esc(v.capa)+'" alt="" loading="lazy"><span class="play" aria-hidden="true"></span>';
+ if(v.video)return '<button type="button" class="thumb'+extra+'" data-video="'+esc(v.video)+'" aria-label="Assistir: '+esc(v.t)+'">'+img+'</button>';
+ return '<div class="thumb'+extra+'">'+img+'</div>';
 }
-function apiYT(fn){
- if(window.YT&&YT.Player)return fn();
- (apiYT.fila=apiYT.fila||[]).push(fn);
- if(apiYT.fila.length>1)return;
- var ant=window.onYouTubeIframeAPIReady;
- window.onYouTubeIframeAPIReady=function(){if(ant)ant();apiYT.fila.forEach(function(g){g()});apiYT.fila=[]};
- var sc=document.createElement("script");sc.src="https://www.youtube.com/iframe_api";document.head.appendChild(sc);
+function card(v,classe,resto){
+ var corpo=tela(v,classe==="card rv"?" capa9":"")+resto;
+ if(v.video)return '<article class="'+classe+'"'+(v.n?' data-n="'+esc(v.n)+'"':'')+'>'+corpo+'</article>';
+ return '<a class="'+classe+'"'+(v.n?' data-n="'+esc(v.n)+'"':'')+' href="'+esc(v.link)+'" target="_blank" rel="noopener" aria-label="Assistir: '+esc(v.t)+'">'+corpo+'</a>';
 }
-
 $("tres").innerHTML=DESTAQUES.map(function(d){
- return '<div class="card rv"><div class="capa9 thumb">'+capaVideo(d.v,d.t||"vídeo em destaque",d.arq)+'</div>'
-  +(d.num?'<div class="big">'+esc(d.num)+'</div>':'')+(d.rot?'<div class="rot">'+esc(d.rot)+'</div>':'')+(d.t?'<h3>'+esc(d.t)+'</h3>':'')+(d.c?'<p>'+esc(d.c)+'</p>':'')
-  +(d.link&&d.link!=="#"?'<a class="verig" href="'+esc(d.link)+'" target="_blank" rel="noopener">ver no Instagram</a>':'')+'</div>'}).join("");
+ return card(d,"card rv",(d.num?'<div class="big">'+esc(d.num)+'</div>':'')+(d.rot?'<div class="rot">'+esc(d.rot)+'</div>':'')+(d.t?'<h3>'+esc(d.t)+'</h3>':'')+(d.c?'<p>'+esc(d.c)+'</p>':''))}).join("");
 
 var nichos=["Todos"];TRABALHOS.forEach(function(t){if(nichos.indexOf(t.n)<0)nichos.push(t.n)});
 $("filtros").innerHTML=nichos.map(function(n,i){return '<button type="button" aria-pressed="'+(i==0)+'" data-n="'+n+'">'+n+'</button>'}).join("");
-/* maxresdefault é a capa escolhida no YouTube Studio; se faltar, usa a menor */
-function capaReserva(img){if(img.src.indexOf("/maxresdefault.jpg")>0)img.src=img.src.replace("/maxresdefault.jpg","/hqdefault.jpg");else img.style.visibility="hidden"}
-$("gal").innerHTML=TRABALHOS.map(function(t){return '<article class="item" data-n="'+esc(t.n)+'"><div class="thumb">'+capaVideo(t.v,t.t,t.arq)+'</div><h3>'+esc(t.t)+'</h3><small>'+esc(t.n)+'</small></article>'}).join("");
+$("gal").innerHTML=TRABALHOS.map(function(t){return card(t,"item",'<h3>'+esc(t.t)+'</h3><small>'+esc(t.n)+'</small>')}).join("");
+
+/* tocar o vídeo no lugar da capa; ao dar play num, os outros pausam */
+document.addEventListener("click",function(e){
+ var b=e.target.closest("[data-video]");if(!b)return;
+ var box=document.createElement("div");box.className=b.className;
+ var v=document.createElement("video");
+ v.src=b.dataset.video;v.poster=b.querySelector("img").src;v.controls=true;v.playsInline=true;v.autoplay=true;
+ v.setAttribute("controlslist","nodownload");v.setAttribute("aria-label",b.getAttribute("aria-label"));
+ box.appendChild(v);b.replaceWith(box);v.play().catch(function(){});v.focus();
+});
+document.addEventListener("play",function(e){document.querySelectorAll("video").forEach(function(v){if(v!==e.target)v.pause()})},true);
+/* pausa ao trocar de filtro */
+$("filtros").addEventListener("click",function(){document.querySelectorAll("#gal video").forEach(function(v){v.pause()})});
 $("filtros").addEventListener("click",function(e){
  var b=e.target.closest("button");if(!b)return;
  document.querySelectorAll("#filtros button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});
- parar();document.querySelectorAll(".item").forEach(function(it){it.hidden=!(b.dataset.n==="Todos"||it.dataset.n===b.dataset.n)});
+ document.querySelectorAll(".item").forEach(function(it){it.hidden=!(b.dataset.n==="Todos"||it.dataset.n===b.dataset.n)});
 });
 
 $("serv").innerHTML=SERVICOS.map(function(s,i){return '<article class="rv"><div class="n">'+fmt(i+1)+'</div><h3>'+s.t+'</h3><p>'+s.d+'</p></article>'}).join("");
@@ -452,12 +435,6 @@ $("bz").textContent="WhatsApp "+PERFIL.whatsTexto;$("be").textContent=PERFIL.ema
 $("bi").textContent="Instagram @"+PERFIL.insta;$("bt").textContent="TikTok @"+PERFIL.tiktok;
 $("fi").textContent="Instagram @"+PERFIL.insta;$("ft").textContent="TikTok @"+PERFIL.tiktok;
 $("ano").textContent=new Date().getFullYear();
-/* e-mail: além de abrir o programa de e-mail, copia o endereço (nem todo computador tem um programa de e-mail configurado) */
-function avisar(t){var a=$("aviso");a.textContent=t;a.classList.add("on");clearTimeout(avisar.t);avisar.t=setTimeout(function(){a.classList.remove("on")},4000)}
-[$("be"),$("fe2")].forEach(function(el){el.addEventListener("click",function(){
- var ok=function(){avisar("E-mail copiado: "+PERFIL.email)};
- try{navigator.clipboard.writeText(PERFIL.email).then(ok,function(){avisar("Meu e-mail: "+PERFIL.email)})}catch(e){avisar("Meu e-mail: "+PERFIL.email)}
-})});
 
 /* menu */
 $("burger").onclick=function(){var o=$("links").classList.toggle("on");this.setAttribute("aria-expanded",o)};
