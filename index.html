@@ -115,6 +115,8 @@ textarea{min-height:120px;resize:vertical}
 .canais{display:flex;flex-direction:column;gap:.8rem;margin-top:1.4rem;align-items:flex-start}
 footer{padding:2.5rem 1.25rem;text-align:center;border-top:1px solid rgba(58,42,34,.15);background:var(--papel)}
 footer a{margin:0 .6rem}
+#aviso{position:fixed;left:50%;bottom:1.5rem;transform:translateX(-50%);z-index:120;background:var(--tinta);color:#fff;padding:.7rem 1.2rem;border-radius:999px;font-size:.95rem;box-shadow:var(--sombra);display:none}
+#aviso.on{display:block}
 /* OBJETOS EM CSS */
 .obj{position:absolute;z-index:0;pointer-events:none;animation:flut 7s ease-in-out infinite;opacity:.9}
 @keyframes flut{50%{transform:translateY(-14px) rotate(3deg)}}
@@ -252,7 +254,7 @@ footer a{margin:0 .6rem}
    <h2>Bora criar <em>juntos</em></h2>
    <p>Conte o que a sua marca precisa e eu respondo com carinho e rapidez.</p>
    <div class="canais">
-    <a class="btn" id="bz" href="#">WhatsApp</a>
+    <a class="btn" id="bz" href="#" target="_blank" rel="noopener">WhatsApp</a>
     <a class="btn o" id="be" href="#">E-mail</a>
     <a class="btn o" id="bi" href="#" target="_blank" rel="noopener">Instagram</a>
     <a class="btn o" id="bt" href="#" target="_blank" rel="noopener">TikTok</a>
@@ -272,7 +274,7 @@ footer a{margin:0 .6rem}
 <!-- 8. RODAPÉ -->
 <footer>
  <p class="serif" style="font-size:1.3rem">Luana Corrêa Andrade da Silva</p>
- <p><a id="fi" href="#" target="_blank" rel="noopener">Instagram</a><a id="ft" href="#" target="_blank" rel="noopener">TikTok</a><a id="fe2" href="#">E-mail</a><a id="fw" href="#">WhatsApp</a></p>
+ <p><a id="fi" href="#" target="_blank" rel="noopener">Instagram</a><a id="ft" href="#" target="_blank" rel="noopener">TikTok</a><a id="fe2" href="#">E-mail</a><a id="fw" href="#" target="_blank" rel="noopener">WhatsApp</a></p>
  <p>&copy; <span id="ano"></span> Luana Corrêa. Todos os direitos reservados.</p>
 </footer>
 
@@ -290,6 +292,8 @@ footer a{margin:0 .6rem}
   </form>
  </div>
 </div>
+
+<p id="aviso" role="status" aria-live="polite"></p>
 
 <script>
 /* ===== DADOS PESSOAIS (edite aqui) ===== */
@@ -426,6 +430,12 @@ $("bz").textContent="WhatsApp "+PERFIL.whatsTexto;$("be").textContent=PERFIL.ema
 $("bi").textContent="Instagram @"+PERFIL.insta;$("bt").textContent="TikTok @"+PERFIL.tiktok;
 $("fi").textContent="Instagram @"+PERFIL.insta;$("ft").textContent="TikTok @"+PERFIL.tiktok;
 $("ano").textContent=new Date().getFullYear();
+/* e-mail: além de abrir o programa de e-mail, copia o endereço (nem todo computador tem um programa de e-mail configurado) */
+function avisar(t){var a=$("aviso");a.textContent=t;a.classList.add("on");clearTimeout(avisar.t);avisar.t=setTimeout(function(){a.classList.remove("on")},4000)}
+[$("be"),$("fe2")].forEach(function(el){el.addEventListener("click",function(){
+ var ok=function(){avisar("E-mail copiado: "+PERFIL.email)};
+ try{navigator.clipboard.writeText(PERFIL.email).then(ok,function(){avisar("Meu e-mail: "+PERFIL.email)})}catch(e){avisar("Meu e-mail: "+PERFIL.email)}
+})});
 
 /* menu */
 $("burger").onclick=function(){var o=$("links").classList.toggle("on");this.setAttribute("aria-expanded",o)};
