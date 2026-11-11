@@ -81,7 +81,7 @@ h1{font-size:clamp(3rem,9vw,6.4rem);letter-spacing:-.01em}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .thumb .play{width:52px;height:52px}
 .thumb>button{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:none;cursor:pointer;display:block}
-.thumb iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
+.thumb iframe,.thumb video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
 .verig{display:inline-block;margin-top:.4rem;font-size:.9rem;color:var(--terra)}
 .item h3{font-size:1.1rem;margin-top:.7rem}
 .item small{color:var(--oliva);font-weight:500}
@@ -319,6 +319,7 @@ var CAPAS_VERSAO="2026-11-02b";
 
 /* ===== DESTAQUES =====
    v: código do vídeo no YouTube (o vídeo toca aqui mesmo na página e a capa vem de lá).
+   arq (opcional): arquivo do vídeo na pasta videos/, ex: "videos/valho-muito.mp4". Com ele o vídeo toca sem a marca do YouTube.
    link: endereço do mesmo vídeo no Instagram (aparece como "ver no Instagram"; deixe "" para esconder).
    num, rot, t, c: número em destaque, legenda do número, título e uma linha de contexto. Campos vazios ("") não aparecem. */
 var DESTAQUES=[
@@ -327,7 +328,8 @@ var DESTAQUES=[
  {link:"https://www.instagram.com/reel/De6-hAUsznH/",v:"V3wXZVkAzVo",num:"609",rot:"visualizações no Instagram",t:"Vista-me",c:""}
 ];
 
-/* ===== TRABALHOS (n: nicho, vira o filtro; v: código do vídeo no YouTube, o trecho depois de /shorts/; o vídeo toca na própria página) ===== */
+/* ===== TRABALHOS (n: nicho, vira o filtro; v: código do vídeo no YouTube, o trecho depois de /shorts/; o vídeo toca na própria página;
+   arq (opcional): arquivo na pasta videos/, ex: arq:"videos/boticario.mp4", para tocar sem a marca do YouTube) ===== */
 var TRABALHOS=[
  {t:"Boticário",n:"Beleza",v:"AwO9YcbSA-k"},
  {t:"Lux (sabores líquidos)",n:"Beleza",v:"NfQbWCoFxrk"},
@@ -389,19 +391,39 @@ var bq=SERVICOS.map(function(s){return "<span>"+s.t+" &bull;</span>"}).join("");
 $("band").innerHTML=bq+bq+bq+bq;
 
 /* ===== VÍDEOS TOCANDO NA PÁGINA ===== */
-function capaVideo(v,titulo){
- return '<button type="button" data-v="'+esc(v)+'" data-t="'+esc(titulo)+'" aria-label="Assistir: '+esc(titulo)+'"><img src="https://i.ytimg.com/vi/'+esc(v)+'/maxresdefault.jpg?v='+CAPAS_VERSAO+'" alt="" loading="lazy" onerror="capaReserva(this)" onload="if(this.naturalWidth<=120)capaReserva(this)"><span class="play" aria-hidden="true"></span></button>'}
+function capaVideo(v,titulo,arq){
+ return '<button type="button" data-v="'+esc(v)+'" data-a="'+esc(arq||"")+'" data-t="'+esc(titulo)+'" aria-label="Assistir: '+esc(titulo)+'"><img src="https://i.ytimg.com/vi/'+esc(v)+'/maxresdefault.jpg?v='+CAPAS_VERSAO+'" alt="" loading="lazy" onerror="capaReserva(this)" onload="if(this.naturalWidth<=120)capaReserva(this)"><span class="play" aria-hidden="true"></span></button>'}
 var tocando=null;
 function parar(){if(tocando){tocando.box.innerHTML=tocando.html;tocando=null}}
 document.addEventListener("click",function(e){
  var b=e.target.closest(".thumb>button");if(!b)return;
  var box=b.parentNode;parar();tocando={box:box,html:box.innerHTML};
- box.innerHTML='<iframe src="https://www.youtube.com/embed/'+esc(b.dataset.v)+'?autoplay=1&playsinline=1&rel=0&modestbranding=1" title="'+esc(b.dataset.t)+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>';
- box.querySelector("iframe").focus();
+ /* arquivo próprio (pasta videos/): toca sem nada do YouTube, com as legendas exatamente como no vídeo */
+ if(b.dataset.a){
+  box.innerHTML='<video src="'+esc(b.dataset.a)+'" controls autoplay playsinline aria-label="'+esc(b.dataset.t)+'"></video>';
+  box.querySelector("video").focus();return}
+ box.innerHTML='<iframe src="https://www.youtube.com/embed/'+esc(b.dataset.v)+'?autoplay=1&playsinline=1&rel=0&cc_load_policy=0&iv_load_policy=3&enablejsapi=1&origin='+encodeURIComponent(location.origin)+'" title="'+esc(b.dataset.t)+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+ var f=box.querySelector("iframe");f.focus();semLegendaAuto(f);
 });
+/* desliga as legendas automáticas do YouTube (as de fundo preto) */
+function semLegendaAuto(f){
+ apiYT(function(){new YT.Player(f,{events:{
+  onReady:function(e){tira(e.target)},
+  onApiChange:function(e){tira(e.target)},
+  onStateChange:function(e){if(e.data===1)tira(e.target)}}})});
+ function tira(p){try{p.unloadModule("captions");p.unloadModule("cc");p.setOption("captions","track",{})}catch(x){}}
+}
+function apiYT(fn){
+ if(window.YT&&YT.Player)return fn();
+ (apiYT.fila=apiYT.fila||[]).push(fn);
+ if(apiYT.fila.length>1)return;
+ var ant=window.onYouTubeIframeAPIReady;
+ window.onYouTubeIframeAPIReady=function(){if(ant)ant();apiYT.fila.forEach(function(g){g()});apiYT.fila=[]};
+ var sc=document.createElement("script");sc.src="https://www.youtube.com/iframe_api";document.head.appendChild(sc);
+}
 
 $("tres").innerHTML=DESTAQUES.map(function(d){
- return '<div class="card rv"><div class="capa9 thumb">'+capaVideo(d.v,d.t||"vídeo em destaque")+'</div>'
+ return '<div class="card rv"><div class="capa9 thumb">'+capaVideo(d.v,d.t||"vídeo em destaque",d.arq)+'</div>'
   +(d.num?'<div class="big">'+esc(d.num)+'</div>':'')+(d.rot?'<div class="rot">'+esc(d.rot)+'</div>':'')+(d.t?'<h3>'+esc(d.t)+'</h3>':'')+(d.c?'<p>'+esc(d.c)+'</p>':'')
   +(d.link&&d.link!=="#"?'<a class="verig" href="'+esc(d.link)+'" target="_blank" rel="noopener">ver no Instagram</a>':'')+'</div>'}).join("");
 
@@ -409,7 +431,7 @@ var nichos=["Todos"];TRABALHOS.forEach(function(t){if(nichos.indexOf(t.n)<0)nich
 $("filtros").innerHTML=nichos.map(function(n,i){return '<button type="button" aria-pressed="'+(i==0)+'" data-n="'+n+'">'+n+'</button>'}).join("");
 /* maxresdefault é a capa escolhida no YouTube Studio; se faltar, usa a menor */
 function capaReserva(img){if(img.src.indexOf("/maxresdefault.jpg")>0)img.src=img.src.replace("/maxresdefault.jpg","/hqdefault.jpg");else img.style.visibility="hidden"}
-$("gal").innerHTML=TRABALHOS.map(function(t){return '<article class="item" data-n="'+esc(t.n)+'"><div class="thumb">'+capaVideo(t.v,t.t)+'</div><h3>'+esc(t.t)+'</h3><small>'+esc(t.n)+'</small></article>'}).join("");
+$("gal").innerHTML=TRABALHOS.map(function(t){return '<article class="item" data-n="'+esc(t.n)+'"><div class="thumb">'+capaVideo(t.v,t.t,t.arq)+'</div><h3>'+esc(t.t)+'</h3><small>'+esc(t.n)+'</small></article>'}).join("");
 $("filtros").addEventListener("click",function(e){
  var b=e.target.closest("button");if(!b)return;
  document.querySelectorAll("#filtros button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});
