@@ -113,6 +113,11 @@ input,textarea{width:100%;font:300 1rem Outfit,sans-serif;padding:.75rem;border:
 textarea{min-height:120px;resize:vertical}
 .ok{display:none;padding:1rem;background:var(--oliva);color:#fff;border-radius:6px;margin-top:1rem}
 .ok.on{display:block}
+.ok.erro{background:var(--terra)}
+.envio{display:flex;gap:.6rem;flex-wrap:wrap}
+.btn:disabled{opacity:.6;cursor:wait;transform:none}
+/* campo-isca contra robôs de spam: invisível para pessoas */
+.mel{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .canais{display:flex;flex-direction:column;gap:.8rem;margin-top:1.4rem;align-items:flex-start}
 footer{padding:2.5rem 1.25rem;text-align:center;border-top:1px solid rgba(58,42,34,.15);background:var(--papel)}
 footer a{margin:0 .6rem}
@@ -262,9 +267,14 @@ footer a{margin:0 .6rem}
   <form id="form" class="rv">
    <label for="fn">Nome</label><input id="fn" required autocomplete="name">
    <label for="fe">E-mail</label><input id="fe" type="email" required autocomplete="email">
+   <label for="fw2">WhatsApp <small>(opcional)</small></label><input id="fw2" type="tel" autocomplete="tel" placeholder="(11) 90000-0000">
    <label for="fm">Mensagem</label><textarea id="fm" required></textarea>
-   <button class="btn" type="submit">Enviar mensagem</button>
-   <p class="ok" id="ok" role="status">Abrimos o WhatsApp com a sua mensagem. É só tocar em enviar!</p>
+   <input type="text" id="fh" class="mel" tabindex="-1" autocomplete="off" aria-hidden="true">
+   <div class="envio">
+    <button class="btn" type="submit" id="fb">Enviar mensagem</button>
+    <button class="btn o" type="button" id="fz">Enviar pelo WhatsApp</button>
+   </div>
+   <p class="ok" id="ok" role="status"></p>
   </form>
  </div>
 </section>
@@ -286,8 +296,9 @@ footer a{margin:0 .6rem}
   <form id="capf">
    <label for="cn">Nome</label><input id="cn" required>
    <label for="ce">E-mail</label><input id="ce" type="email" required>
-   <button class="btn" type="submit">Quero receber</button>
-   <p class="ok" id="cok" role="status">Abrimos o WhatsApp com o seu pedido. É só tocar em enviar!</p>
+   <input type="text" id="ch" class="mel" tabindex="-1" autocomplete="off" aria-hidden="true">
+   <button class="btn" type="submit" id="cb">Quero receber</button>
+   <p class="ok" id="cok" role="status"></p>
   </form>
  </div>
 </div>
@@ -449,9 +460,28 @@ function contar(el){
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");e.target.querySelectorAll("[data-to]").forEach(contar);if(e.target.dataset.to)contar(e.target);io.unobserve(e.target)}})},{threshold:.15});
 document.querySelectorAll(".rv,.stats,[data-to]").forEach(function(el){io.observe(el)});
 
-/* formulários: enviam a mensagem pelo WhatsApp */
+/* formulários: "Enviar" manda direto para o e-mail da Luana (serviço gratuito FormSubmit);
+   o botão do WhatsApp abre a conversa com a mensagem pronta. */
 function whats(txt){window.open("https://wa.me/"+PERFIL.whats+"?text="+encodeURIComponent(txt),"_blank","noopener")}
-$("form").onsubmit=function(e){e.preventDefault();whats("Oi Luana! Vi seu portfólio.\nNome: "+$("fn").value+"\nE-mail: "+$("fe").value+"\n\n"+$("fm").value);$("ok").classList.add("on");this.reset()};
+function enviaEmail(assunto,dados,isca){
+ if(isca)return Promise.resolve();
+ return fetch("https://formsubmit.co/ajax/"+PERFIL.email,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},
+  body:JSON.stringify(Object.assign({_subject:assunto,_template:"table",_captcha:"false"},dados))})
+  .then(function(r){return r.json()}).then(function(j){if(String(j.success)!=="true")throw new Error(j.message||"falha")});
+}
+function aviso(id,txt,erro){var p=$(id);p.textContent=txt;p.classList.add("on");p.classList.toggle("erro",!!erro)}
+function textoContato(){return "Oi Luana! Vi seu portfólio.\nNome: "+$("fn").value+"\nE-mail: "+$("fe").value+($("fw2").value?"\nWhatsApp: "+$("fw2").value:"")+"\n\n"+$("fm").value}
+$("form").onsubmit=function(e){
+ e.preventDefault();var f=this,b=$("fb");b.disabled=true;b.textContent="Enviando...";
+ enviaEmail("Nova mensagem pelo portfólio: "+$("fn").value,{Nome:$("fn").value,email:$("fe").value,WhatsApp:$("fw2").value||"não informado",Mensagem:$("fm").value},$("fh").value)
+  .then(function(){aviso("ok","Mensagem enviada! Obrigada pelo carinho, respondo em breve.");f.reset()})
+  .catch(function(){aviso("ok","Não consegui enviar agora. Tente pelo botão do WhatsApp ou pelo e-mail "+PERFIL.email+".",true)})
+  .then(function(){b.disabled=false;b.textContent="Enviar mensagem"});
+};
+$("fz").onclick=function(){
+ var f=$("form");if(!f.reportValidity())return;
+ whats(textoContato());aviso("ok","Abrimos o WhatsApp com a sua mensagem. É só tocar em enviar!");
+};
 
 /* card de captura: uma vez por visita */
 var cap=$("cap"),antes=null;
@@ -462,7 +492,13 @@ if(!visto)setTimeout(abrir,7000);
 $("capx").onclick=fechar;
 cap.addEventListener("click",function(e){if(e.target===cap)fechar()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&cap.classList.contains("on"))fechar()});
-$("capf").onsubmit=function(e){e.preventDefault();whats("Oi Luana! Quero receber seu mídia kit.\nNome: "+$("cn").value+"\nE-mail: "+$("ce").value);$("cok").classList.add("on");setTimeout(fechar,2500)};
+$("capf").onsubmit=function(e){
+ e.preventDefault();var b=$("cb");b.disabled=true;b.textContent="Enviando...";
+ enviaEmail("Pedido de mídia kit: "+$("cn").value,{Nome:$("cn").value,email:$("ce").value,Pedido:"Quer receber o mídia kit"},$("ch").value)
+  .then(function(){aviso("cok","Pronto! Em breve o mídia kit chega no seu e-mail.");setTimeout(fechar,2500)})
+  .catch(function(){aviso("cok","Não consegui enviar agora. Me chame no WhatsApp "+PERFIL.whatsTexto+".",true)})
+  .then(function(){b.disabled=false;b.textContent="Quero receber"});
+};
 </script>
 </body>
 </html>
